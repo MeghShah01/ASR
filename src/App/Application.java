@@ -1,18 +1,23 @@
 package App;
 
+import Core.Event.Event;
+import Core.IO.User.KeyHandler;
+import Core.IO.User.MouseHandler;
 import Core.Rendering.*;
-import Core.IO.*;
 import Core.Timer.*;
 
 import javax.swing.*;
+import java.util.List;
 
 public class Application implements Runnable
 {
-    private RenderPanel renderPanel;
-    private Window window;
+    private final RenderPanel renderPanel;
+    private final Window window;
     private Thread thread;
     LayerHandler layerHandler;
-    private Clock clock;
+    private final KeyHandler keyHandler;
+    private final MouseHandler mouseHandler;
+    private final Clock clock;
     private int frames = 0;
     private double acc = 0.0;
 
@@ -20,8 +25,12 @@ public class Application implements Runnable
     public Application (int width, int height)
     {
         this.layerHandler = new LayerHandler();
+        this.mouseHandler = new MouseHandler(layerHandler);
+        this.keyHandler = new KeyHandler(layerHandler);
         this.renderPanel = new RenderPanel(width, height, this.layerHandler);
         this.window = new Window(width, height, renderPanel);
+        this.window.addKeyListener(this.keyHandler);
+        this.window.addMouseListener(this.mouseHandler);
         this.clock = new Clock();
 
         startThread();
@@ -49,6 +58,11 @@ public class Application implements Runnable
             clock.onUpdate(deltaTime);
 
             layerHandler.updateLayers(this.clock);
+
+            layerHandler.collectEvents();
+
+            layerHandler.notifyEventListeners();
+
             SwingUtilities.invokeLater(this.renderPanel::repaint);
 
             printFPS(clock);

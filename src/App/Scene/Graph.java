@@ -1,15 +1,17 @@
 package App.Scene;
 
+import Core.Event.Event;
+import Core.Event.EventListener;
+import Core.Event.EventType;
+import Core.IO.File.FileHandler;
 import Core.Math.Vector2f;
-import Core.Rendering.*;
-import Core.IO.*;
 import Core.Timer.*;
 
 
 
 import java.awt.*;
 
-public class Graph implements Layer
+public class Graph implements EventListener
 {
     private Plotter plotter;
 
@@ -33,16 +35,28 @@ public class Graph implements Layer
         this.plotter = new Plotter(data, dataSize, samplesPerSec, 2.0f);
     }
 
-
-    @Override
     public void update(Clock clock)
     {
 
     }
 
-    @Override
     public void draw(Graphics2D graphics2D)
     {
         plotter.draw(graphics2D);
+    }
+
+    @Override
+    public void onEvent(Event event)
+    {
+        if (event.getEventType() == EventType.KEY_PRESSED)
+        {
+            System.out.println("Key Pressed!");
+            event.setHandled();
+        }
+        else if (event.getEventType() == EventType.LEFT_MOUSE_CLICK)
+        {
+            System.out.println("Left Mouse Clicked!");
+            event.setHandled();
+        }
     }
 }

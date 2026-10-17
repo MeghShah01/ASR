@@ -1,4 +1,4 @@
-package Core.IO;
+package Core.IO.File;
 
 public interface FileHeader
 {

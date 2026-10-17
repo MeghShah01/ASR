@@ -1,19 +1,22 @@
 package Core.Rendering;
 
+import Core.Event.Event;
+import Core.Event.EventType;
 import Core.Timer.Clock;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Collections;
 
 public class LayerHandler
 {
     private final List<List<Layer>> layers;
+    private Queue <Event> eventQueue;
 
     public LayerHandler()
     {
         this.layers = new ArrayList<>();
+        this.eventQueue = new ArrayDeque<>();
     }
 
     public void addLayerToLevel(Layer layerScene, int level)
@@ -89,6 +92,47 @@ public class LayerHandler
         for (List<Layer> layer : this.layers)
         {
             layer.getFirst().update(clock);
+        }
+    }
+
+    public void collectEvents ()
+    {
+        for (List<Layer> layers : this.layers)
+        {
+            Event event = layers.getFirst().getEvents();
+
+            if (event != null)
+            {
+                this.eventQueue.add(event);
+            }
+        }
+    }
+
+    public void enqueueEvent (Event event)
+    {
+        this.eventQueue.add(event);
+    }
+
+
+    public void notifyEventListeners ()
+    {
+        Queue<Event> tempQueue = this.eventQueue;
+
+        this.eventQueue = new ArrayDeque<>();
+
+        while (!tempQueue.isEmpty())
+        {
+            Event event = tempQueue.poll();
+
+            for (int i = this.layers.size()-1; i >= 0; i --)
+            {
+                this.layers.get(i).getFirst().onEvent(event);
+
+                if (event.isHandled())
+                {
+                    break;
+                }
+            }
         }
     }
 

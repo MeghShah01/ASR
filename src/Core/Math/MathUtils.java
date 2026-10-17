@@ -2,9 +2,9 @@ package Core.Math;
 
 public final class MathUtils
 {
-    public static float lerp (float startValue, float endValue, )
+    public static float lerp (float startValue, float endValue, long dt)
     {
-        return 0.0f;
+        return startValue + (endValue - startValue)*dt;
     }
 
     public static float cubic ()
@@ -12,8 +12,16 @@ public final class MathUtils
         return 0.0f;
     }
 
-    public static float clamp ()
+    public static float clamp (float x, float min, float max)
     {
-        return 0.0f;
+        if (x >= max)
+        {
+            return max;
+        }
+        else if (x <= min)
+        {
+            return min;
+        }
+        return x;
     }
 }
